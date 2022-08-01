@@ -1,7 +1,9 @@
+from this import d
 import pygame
 import sys
 from setting import *
 from event import EVENT
+from tama import *
 
 pygame.init()
 run = True
@@ -23,16 +25,23 @@ class button(pygame.sprite.Sprite):
         self.image = self.asset[self.numb]
         self.rect = self.image.get_rect()
         self.rect.topleft = (x,y)
+        self.mouse_out = 1
     
     def get_input(self):
         self.mouse_pos = pygame.mouse.get_pos()
         self.mouse_clicked = pygame.mouse.get_pressed()[0]
         if (self.x + self.rect.width > self.mouse_pos[0] > self.x) and (self.y + self.rect.height > self.mouse_pos[1] > self.y):
             self.numb = self.animate_2
-            if self.mouse_clicked:
-                print('1')
+            if self.mouse_clicked and self.mouse_out == 1:
+                tama_group.remove(tama_group)
+                tama_group.add(digitama(digitama.random_selection(self)))
+                self.mouse_out = 0
+            elif [i == pygame.MOUSEBUTTONUP for i  in pygame.event.get()]:
+                self.mouse_out = 1
+
         else:
             self.numb = self.animate_1  
+
               
 
     def animate(self):
@@ -45,7 +54,8 @@ class button(pygame.sprite.Sprite):
 
 
 
-button_group = pygame.sprite.Group(button(0,90,225))
+button_group = pygame.sprite.Group(button(0,110,225))
+tama_group = pygame.sprite.Group(digitama(17))
 
 screen = pygame.display.set_mode((w,h))
 
@@ -53,6 +63,8 @@ while run:
     screen.blit(background,(0,0))
     button_group.draw(screen)
     button_group.update()
+    
+    tama_group.draw(screen)
 
     
     for event in pygame.event.get():
